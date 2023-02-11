@@ -19,8 +19,4 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set build number
-      id: set-build-number
-      run: |
-        echo ::set-env name=BUILD_NUMBER::$(date +%s)
 
