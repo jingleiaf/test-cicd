@@ -36,5 +36,5 @@ jobs:
        imageName = ${{ github.event.inputs.imageName }}
        imageTag = ${{ github.event.inputs.imageTag }}
        imageVersion = ${{ github.event.inputs.imageVersion }}
-       ./ci/build_docker_images.sh ${{ github.event.inputs.dockerFileDir }}
+       ./ci/build_docker_images.sh
       shell: bash
