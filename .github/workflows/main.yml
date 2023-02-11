@@ -1,0 +1,26 @@
+name: Build Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_FILE_DIR: path
+  IMAGE_NAME: image1
+  IMAGE_TAG: latest
+  IMAGE_VERSION: 1.0.O
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set build number
+      id: set-build-number
+      run: |
+        echo ::set-env name=BUILD_NUMBER::$(date +%s)
+
