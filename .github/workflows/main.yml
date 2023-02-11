@@ -2,19 +2,19 @@ name: Build Docker Images
 
 on:
   workflow_dispatch:
-  inputs:
-      dockerFileDir:
-        description: 'Docker File Directory'     
-        required: true
-      imageName:
-        description: 'Image Name' 
-        required: true
-      imageTag:
-        description: 'Image tag' 
-        required: true
-      imageVersion:
-        description: 'Image version' 
-        required: true       
+    inputs:
+        dockerFileDir:
+          description: 'Docker File Directory'     
+          required: true
+        imageName:
+          description: 'Image Name' 
+          required: true
+        imageTag:
+          description: 'Image tag' 
+          required: true
+        imageVersion:
+          description: 'Image version' 
+          required: true       
 
 
 jobs:
