@@ -13,7 +13,7 @@ function main() {
 
     pushd "${dockerFile_dir}"
         build_latest
-        || {
+        {
             rc=$?
         }
     popd
