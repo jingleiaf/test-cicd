@@ -32,5 +32,5 @@ jobs:
         echo "image version : ${{ github.event.inputs.imageVersion }}" 
     
     - run: |
-       dockerFile_dir="${{ github.event.inputs.dockerFileDir }}" imageName="${{ github.event.inputs.imageName }}" imageTag="${{ github.event.inputs.imageTag }}" imageVersion="${{ github.event.inputs.imageVersion }}" ./ci/build_docker_images.sh
+       dockerFile_dir="${{ github.event.inputs.dockerFileDir }}" imageName="${{ github.event.inputs.imageName }}" imageTag="${{ github.event.inputs.imageTag }}" imageVersion="${{ github.event.inputs.imageVersion }}" ./ci/build_docker_images_github.sh
       shell: bash
