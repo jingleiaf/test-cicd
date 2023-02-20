@@ -37,7 +37,8 @@ jobs:
         exit 1
       fi
 
-    - name: Run docker shell
+    - name: Build image
+      id: buildImage
       run: |
         cd ${{ github.event.inputs.dockerFileDir }}
         image_id="${{ DOCKER_REGISTRY }}/${{ github.event.inputs.imageName }}" 
@@ -45,14 +46,18 @@ jobs:
       if: steps.checkDirectory.outcome == 'success'
     
     - name: docker login
+      id: login
       run:   docker --config "tmp/docker-config.json" login -u "${{ secrets.DOCKER_LOGIN }}" -p "${{ secrets.DOCKER_PASSWORD }}" "${{ DOCKER_REGISTRY }}"
+      if: steps.buildImage.outcome == 'success'
 
     - name: docker publish
       run: | 
         image_id="${{ DOCKER_REGISTRY }}/${{ github.event.inputs.imageName }}" 
         image_version_id="${{ github.event.inputs.imageVersion }}-${{ github.run_number }}"
         docker tag "${image_id}" "${image_version_id}" && docker --config "tmp/docker-config.json" push "${image_version_id}"
+      if: steps.buildImage.login == 'success'
 
     - name: docker logout
       run: rm -rf "tmp/docker-config.json"
+      if: steps.buildImage.login == 'success'
 
