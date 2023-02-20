@@ -30,12 +30,12 @@ jobs:
     - name: Check if directory exists
       id: checkDirectory
       run: |
-      if [ -d ${{ github.event.inputs.dockerFileDir }} ]; then
-        echo "${{ github.event.inputs.dockerFileDir }} exists"
-      else
-        echo "${{ github.event.inputs.dockerFileDir }} does not exist"
-        exit 1
-      fi
+        if [ -d ${{ github.event.inputs.dockerFileDir }} ]; then
+          echo "${{ github.event.inputs.dockerFileDir }} exists"
+        else
+          echo "${{ github.event.inputs.dockerFileDir }} does not exist"
+          exit 1
+        fi
 
     - name: Build image
       id: buildImage
