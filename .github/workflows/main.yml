@@ -17,7 +17,7 @@ on:
           required: true       
 
 env: 
-  DOCKER_REGISTRY: 	test.com
+  DOCKER_REGISTRY: test.com
 
 jobs:
   build:
