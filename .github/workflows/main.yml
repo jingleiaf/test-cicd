@@ -16,6 +16,8 @@ on:
           description: 'Image version' 
           required: true       
 
+env: 
+  DOCKER_REGISTRY: 	test.com
 
 jobs:
   build:
@@ -23,16 +25,34 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - run: |
-        echo "docker file  diretory : ${{ github.event.inputs.dockerFileDir }}"
-        echo "image name : ${{ github.event.inputs.imageName }}" 
-        echo "image tag : ${{ github.event.inputs.imageTag }}"
-        echo "image version : ${{ github.event.inputs.imageVersion }}" 
-        dockerFile_dir="${{ github.event.inputs.dockerFileDir }}" \ 
-        && imageName="${{ github.event.inputs.imageName }}" \ 
-        && imageTag="${{ github.event.inputs.imageTag }}" \
-        && imageVersion="${{ github.event.inputs.imageVersion }}" \
-        && ./ci/build_docker_images_github.sh
-      shell: bash
+    - name: Check if directory exists
+      id: checkDirectory
+      run: |
+      if [ -d ${{ github.event.inputs.dockerFileDir }} ]; then
+        echo "${{ github.event.inputs.dockerFileDir }} exists"
+      else
+        echo "${{ github.event.inputs.dockerFileDir }} does not exist"
+        exit 1
+      fi
+
+    - name: Run docker shell
+      run: |
+        cd ${{ github.event.inputs.dockerFileDir }}
+        image_id="${{ DOCKER_REGISTRY }}/${{ github.event.inputs.imageName }}" 
+        docker build -t "${image_id}" . 
+      if: steps.checkDirectory.outcome == 'success'
+    
+    - name: docker login
+      run:   docker --config "tmp/docker-config.json" login -u "${{ secrets.DOCKER_LOGIN }}" -p "${{ secrets.DOCKER_PASSWORD }}" "${{ DOCKER_REGISTRY }}"
+
+    - name: docker publish
+      run: | 
+        image_id="${{ DOCKER_REGISTRY }}/${{ github.event.inputs.imageName }}" 
+        image_version_id="${{ github.event.inputs.imageVersion }}-${{ github.run_number }}"
+        docker tag "${image_id}" "${image_version_id}" && docker --config "tmp/docker-config.json" push "${image_version_id}"
+
+    - name: docker logout
+      run: rm -rf "tmp/docker-config.json"
+
