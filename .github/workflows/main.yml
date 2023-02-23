@@ -9,15 +9,12 @@ on:
         imageName:
           description: 'Image Name' 
           required: true
-        imageTag:
-          description: 'Image tag' 
-          required: true
         imageVersion:
           description: 'Image version' 
           required: true       
 
 env: 
-  DOCKER_REGISTRY: test.com
+  DOCKER_REGISTRY: harbor-tls.af-klm.com
 
 jobs:
   build:
@@ -37,27 +34,24 @@ jobs:
           exit 1
         fi
 
-    - name: Build image
-      id: buildImage
-      run: |
-        cd ${{ github.event.inputs.dockerFileDir }}
-        image_id="$DOCKER_REGISTRY/${{ github.event.inputs.imageName }}" 
-        docker build -t "${image_id}" . 
-      if: steps.checkDirectory.outcome == 'success'
-    
-    - name: docker login
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        registry: $DOCKER_REGISTRY
+        username: ${{ secrets.HARBOR_TLS_HOST }}
+        password: ${{ secrets.HARBOR_TLS_PASSWORD }}
       id: login
-      run:   docker --config "tmp/docker-config.json" login -u "${{ secrets.DOCKER_LOGIN }}" -p "${{ secrets.DOCKER_PASSWORD }}" "$DOCKER_REGISTRY"
-      if: steps.buildImage.outcome == 'success'
 
-    - name: docker publish
-      run: | 
-        image_id="$DOCKER_REGISTRY/${{ github.event.inputs.imageName }}" 
-        image_version_id="${{ github.event.inputs.imageVersion }}-${{ github.run_number }}"
-        docker tag "${image_id}" "${image_version_id}" && docker --config "tmp/docker-config.json" push "${image_version_id}"
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: ${{ github.event.inputs.dockerFileDir }}
+        push: true
+        tags: $DOCKER_REGISTRY/${{ github.event.inputs.imageName }}:${{ github.event.inputs.imageVersion }}-${{ github.run_number }}
       if: steps.buildImage.login == 'success'
 
-    - name: docker logout
-      run: rm -rf "tmp/docker-config.json"
+    - name: Docker logout
+      uses: docker/login-action@v2
+      with: 
+        logout: true
       if: steps.buildImage.login == 'success'
-
