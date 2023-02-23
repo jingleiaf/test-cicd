@@ -48,7 +48,6 @@ jobs:
         context: ${{ github.event.inputs.dockerFileDir }}
         push: true
         tags: $DOCKER_REGISTRY/${{ github.event.inputs.imageName }}:${{ github.event.inputs.imageVersion }}-${{ github.run_number }}
-      if: steps.buildImage.login == 'success'
 
     - name: Docker logout
       uses: docker/login-action@v2
