@@ -32,8 +32,8 @@ jobs:
         id: select-directory
         run: |
           DIRECTORIES=$(cat directories.txt)
-          IFS=$'\n' read -rd '' -a OPTIONS <<< "$DIRECTORIES"
-          echo "::set-output name=selectedDirectory::${{ github.event.inputs.dockerFileDir }}"     
+          OPTIONS=($DIRECTORIES)
+          echo "::set-output name=selectedDirectory::${OPTIONS[${{ github.event.inputs.dockerFileDir }}]}"   
 
   build:
     runs-on: ubuntu-latest
