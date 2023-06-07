@@ -17,8 +17,26 @@ env:
   DOCKER_REGISTRY: harbor-tls.af-klm.com
 
 jobs:
+  set-dockerFileDir:
+    runs-on: ubuntu-latest
+    outputs:
+      directories: ${{ steps.get-directories.outputs.directories }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get directories
+        id: get-directories
+        run: |
+          find . -type d -printf "%P\n" > directories.txt
+
   build:
     runs-on: ubuntu-latest
+    needs: set-dockerFileDir
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.set-dockerFileDir.outputs.directories) }}
 
     steps:
     - name: Checkout code
@@ -33,24 +51,3 @@ jobs:
           echo "${{ github.event.inputs.dockerFileDir }} does not exist"
           exit 1
         fi
-
-    - name: Docker login
-      uses: docker/login-action@v2
-      with:
-        registry: $DOCKER_REGISTRY
-        username: ${{ secrets.HARBOR_TLS_HOST }}
-        password: ${{ secrets.HARBOR_TLS_PASSWORD }}
-      id: login
-
-    - name: Build and push
-      uses: docker/build-push-action@v4
-      with:
-        context: ${{ github.event.inputs.dockerFileDir }}
-        push: true
-        tags: $DOCKER_REGISTRY/${{ github.event.inputs.imageName }}:${{ github.event.inputs.imageVersion }}-${{ github.run_number }}
-
-    - name: Docker logout
-      uses: docker/login-action@v2
-      with: 
-        logout: true
-      if: steps.buildImage.login == 'success'
