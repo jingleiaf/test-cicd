@@ -21,19 +21,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get directories
         id: get-directories
         run: |
           find . -type d -printf "%P\n" > directories.txt
+          
+      - name: Select Docker directory
+        id: select-directory
+        run: |
+          DIRECTORIES=$(cat directories.txt)
+          IFS=$'\n' read -rd '' -a OPTIONS <<< "$DIRECTORIES"
+          echo "::set-output name=selectedDirectory::${{ github.event.inputs.dockerFileDir }}"     
 
   build:
     runs-on: ubuntu-latest
     needs: set-dockerFileDir
-    strategy:
-      matrix:
-        directory: ${{ fromJson(needs.set-dockerFileDir.outputs.directories) }}
 
     steps:
     - name: Checkout code
