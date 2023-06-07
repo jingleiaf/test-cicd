@@ -33,7 +33,8 @@ jobs:
         run: |
           DIRECTORIES=$(cat directories.txt)
           OPTIONS=($DIRECTORIES)
-          echo "::set-output name=selectedDirectory::${OPTIONS[${{ github.event.inputs.dockerFileDir }}]}"   
+          SELECTED_DIR="${OPTIONS[${{ github.event.inputs.dockerFileDir }}]}"
+          echo "::set-output name=selectedDirectory::$SELECTED_DIR"  
 
   build:
     runs-on: ubuntu-latest
