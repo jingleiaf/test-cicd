@@ -3,9 +3,6 @@ name: Build Docker Images
 on:
   workflow_dispatch:
     inputs:
-        dockerFileDir:
-          description: 'Docker File Directory'     
-          required: true
         imageName:
           description: 'Image Name' 
           required: true
