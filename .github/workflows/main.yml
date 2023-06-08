@@ -5,7 +5,13 @@ on:
     inputs:
         imageName:
           description: 'Image Name' 
-          required: true    
+          required: true
+          type: choice
+          options:
+          - image1/test
+          - image2/test
+          - image3/test
+          - image0/test
 
 env: 
   DOCKER_REGISTRY: harbor-tls.af-klm.com
