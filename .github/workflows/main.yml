@@ -5,51 +5,25 @@ on:
     inputs:
         imageName:
           description: 'Image Name' 
-          required: true
-        imageVersion:
-          description: 'Image version' 
-          required: true       
+          required: true    
 
 env: 
   DOCKER_REGISTRY: harbor-tls.af-klm.com
 
 jobs:
-  set-dockerFileDir:
-    runs-on: ubuntu-latest
-    outputs:
-      directories: ${{ steps.get-directories.outputs.directories }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Get directories
-        id: get-directories
-        run: |
-          find . -type d -printf "%P\n" > directories.txt
-          
-      - name: Select Docker directory
-        id: select-directory
-        run: |
-          DIRECTORIES=$(cat directories.txt)
-          OPTIONS=($DIRECTORIES)
-          SELECTED_DIR="${OPTIONS[${{ github.event.inputs.dockerFileDir }}]}"
-          echo "::set-output name=selectedDirectory::$SELECTED_DIR"  
-
   build:
     runs-on: ubuntu-latest
-    needs: set-dockerFileDir
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Check if directory exists
-      id: checkDirectory
+    - name: Read map file and extract value
+      id: extract-value
       run: |
-        if [ -d ${{ github.event.inputs.dockerFileDir }} ]; then
-          echo "${{ github.event.inputs.dockerFileDir }} exists"
-        else
-          echo "${{ github.event.inputs.dockerFileDir }} does not exist"
-          exit 1
-        fi
+        # Read the map file and extract the value using jq
+        value=$(cat map.json | jq --raw-output .${{ github.event.inputs.imageName }})
+        echo "::set-output name=value::$value"
+   
+    - name: Use the retrieved value
+      run: |
+        echo "Retrieved value: ${{ steps.extract-value.outputs.value }}"
