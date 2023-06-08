@@ -27,7 +27,7 @@ jobs:
       id: extract-value
       run: |
         # Read the map file and extract the value using jq
-        value=$(cat map.json | jq --raw-output .${{ github.event.inputs.imageName }})
+        value=$(cat map.json | jq --raw-output --arg IMAGE_NAME "${{ github.event.inputs.imageName }}" '.[$IMAGE_NAME]')
         echo "::set-output name=value::$value"
    
     - name: Use the retrieved value
